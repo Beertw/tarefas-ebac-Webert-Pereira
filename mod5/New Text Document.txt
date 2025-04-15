@@ -1,0 +1,67 @@
+algoritmo "Rotina_Acordar_Modular"
+
+// Procedimentos (funções sem retorno) 
+
+procedimento acordar ()
+Inicio
+	escreva("Abrir os olhos")
+	escreva("Levantar da cama")
+	escreva("Calçar o chinelo")
+fimprocedimento
+
+procedimento higieneMatinal()
+Inicio
+	escreva("Ir até o banheiro")
+	escreva("lavar o rosto")
+fimprocedimento
+
+procedimento tomarCafeDaManha()
+Inicio
+	escreva("ir até a cozinha")
+	escreva("Preparar o café da manhã")
+	escreva("Tomar café da manhã")
+fimprocedimento
+
+procedimento banho()
+Inicio
+	escreva("Ir até o banheiro")
+	escreva("Tomar banho")
+fimprocedimento
+
+procedimento seArrumar()
+inicio
+	escreva("Se vestir para ir ao trabalho")
+	escreva("Pegar as chaves do carro")
+fimprocedimento
+
+procedimento sairDeCasa()
+Inicio
+	escreva("Ir até a garagem")
+	escreva("Entrar no carro")
+	escreva("Abrir o portão da garagem")
+	escreva("Dirigir para fora da garagem")
+	escreva("Fechar o portão da garagem")
+fimprocedimento
+
+procedimento abastecer()
+inicio
+	escreva("Dirigir até o posto de gasolina")
+	escreva("Abastecer o carro")
+fimprocedimento
+
+procedimento irParaTrabalho()
+inicio
+	escreva("Ir para o trabalho")
+fimprocedimento
+
+// Programa principal
+inicio
+	acordar()
+	higieneMatinal()
+	tomarCafeDaManha()
+	banho()
+	seArrumar()
+	sairDeCasa()
+	abastecer()
+	irParaTrabalho()
+fimalgoritimo
