@@ -1,110 +1,122 @@
-import domain.Client;
-import dao.IClient;
 import dao.ClientMap;
+import dao.IClient;
+import domain.Client;
 
 import javax.swing.*;
 
 public class Main {
-    private static IClient iClient;
+    private static IClient iClient = new ClientMap();
 
     public static void main(String[] args) {
+        while (true) {
+            String option = JOptionPane.showInputDialog(null,
+                    "Menu:\n" +
+                            "1 - Cadastrar cliente\n" +
+                            "2 - Consultar cliente\n" +
+                            "3 - Excluir cliente\n" +
+                            "4 - Alterar cliente\n" +
+                            "5 - Listar todos\n" +
+                            "0 - Sair",
+                    "Sistema de Cadastro",
+                    JOptionPane.INFORMATION_MESSAGE);
 
-        iClient = new ClientMap();
-
-        String option = JOptionPane.showInputDialog(null,"Digite 1 para cadastro, 2 para consultar, 3 para exclusão, 4 para alterar, 5 para sair", "Cadastro", JOptionPane.INFORMATION_MESSAGE);
-
-        while (!validatedOption(option)) {
-            if ("".equals(option)) {
+            if (option == null || option.equals("0")) {
                 exit();
-
-            } else {
-                option = JOptionPane.showInputDialog((null, "Opção inválida, digite 1 para cadastro, 2 para consultar, 3 para exclusão, 4 para alterar, 5 para sair", "Inválido: ", JOptionPane.INFORMATION_MESSAGE);
             }
 
-            while (validatedOption(option)) {
-                if (exitOption(option)) {
-                    exit();
-
-                } else if (registerOption(option)) {
-                    String data = JOptionPane.showInputDialog(null, "Digite os dados do cliente separados por vírgula, na seguinte ordem: Nome, CPF, Telefone, Endereço, Número da Residência, Cidade, Estado,", "Dados: ", JOptionPane.INFORMATION_MESSAGE);
-
-                } else if (consultOption(option)) {
-                    String data = JOptionPane.showInputDialog(null, "Digite o cpf: ", "Consultar: ", JOptionPane.INFORMATION_MESSAGE);
-                    consult(data);
-
-                }
-
-                option = JOptionPane.showInputDialog(null, "Digite 1 para cadastro, 2 para consultar, 3 para exclusão, 4 para alterar, 5 para sair", "Opções: ", JOptionPane.INFORMATION_MESSAGE);
-
+            switch (option) {
+                case "1" -> register();
+                case "2" -> consult();
+                case "3" -> exclude();
+                case "4" -> change();
+                case "5" -> listAll();
+                default -> JOptionPane.showMessageDialog(null,
+                        "Opção inválida!", "Erro",
+                        JOptionPane.ERROR_MESSAGE);
             }
         }
-        private static void consult(String data) {
-            Client client = iClient.consult(Long.parseLong(data));
+    }
 
-            if (client != null) {
-                JOptionPane.showMessageDialog(null, "Cliente encontrado: " + client.toString(), "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+    private static void register() {
+        String data = JOptionPane.showInputDialog(null,
+                "Digite os dados separados por vírgula:\n" +
+                        "Nome, CPF, Telefone, Endereço, Número, Cidade, Estado");
 
-            } else {
-                JOptionPane.showMessageDialog(null, "Cliente não encontrado: ", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+        if (data == null || data.isBlank()) return;
 
-            }
-        }
-        private static boolean consultOption(String option) {
-            if ("2".equals(option)) {
-                return true;
-
-            } else {
-                return false;
-
-            }
-        }
-
-        private static void register(String data) {
+        try {
             String[] separateData = data.split(",");
-            Client client = new Client(separateData[0], separateData[1], separateData[2], separateData[3], separateData[4], separateData[5], separateData[6]);
+            Client client = new Client(separateData[0], separateData[1], separateData[2],
+                    separateData[3], separateData[4], separateData[5], separateData[6]);
 
-            Boolean registerOption = iClient.register(client);
-
-            if (registerOption) {
-                JOptionPane.showInputDialog(null, "Cliente cadastrado com sucesso", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
-
+            if (iClient.register(client)) {
+                JOptionPane.showMessageDialog(null, "Cliente cadastrado com sucesso!");
             } else {
-                JOptionPane.showMessageDialog(null, "Cliente já cadastrado", "Erro", JOptionPane.INFORMATION_MESSAGE);
-
+                JOptionPane.showMessageDialog(null, "Já existe cliente com este CPF!");
             }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Erro ao cadastrar. Verifique os dados!");
         }
-        private static boolean registerOption(String option) {
-            if ("1".equals(option)) {
-                return true;
+    }
 
+    private static void consult() {
+        String cpf = JOptionPane.showInputDialog("Digite o CPF do cliente:");
+        if (cpf == null || cpf.isBlank()) return;
+
+        Client client = iClient.consult(Long.valueOf(cpf));
+        if (client != null) {
+            JOptionPane.showMessageDialog(null, "Cliente encontrado:\n" + client);
         } else {
-                return false;
+            JOptionPane.showMessageDialog(null, "Cliente não encontrado!");
+        }
+    }
 
-            }
+    private static void exclude() {
+        String cpf = JOptionPane.showInputDialog("Digite o CPF para excluir:");
+        if (cpf == null || cpf.isBlank()) return;
+
+        iClient.exclude(Long.valueOf(cpf));
+        JOptionPane.showMessageDialog(null, "Cliente excluído (se existia).");
+    }
+
+    private static void change() {
+        String cpf = JOptionPane.showInputDialog("Digite o CPF do cliente que deseja alterar:");
+        if (cpf == null || cpf.isBlank()) return;
+
+        Client existing = iClient.consult(Long.valueOf(cpf));
+        if (existing == null) {
+            JOptionPane.showMessageDialog(null, "Cliente não encontrado!");
+            return;
         }
 
-        private static void exit() {
-            JOptionPane.showMessageDialog(null, "Fechando...", "Sair", JOptionPane.INFORMATION_MESSAGE);
-            System.exit(0);
+        String data = JOptionPane.showInputDialog(null,
+                "Digite os novos dados separados por vírgula:\n" +
+                        "Nome, CPF, Telefone, Endereço, Número, Cidade, Estado");
+
+        if (data == null || data.isBlank()) return;
+
+        try {
+            String[] separateData = data.split(",");
+            Client client = new Client(separateData[0], separateData[1], separateData[2],
+                    separateData[3], separateData[4], separateData[5], separateData[6]);
+
+            iClient.change(client);
+            JOptionPane.showMessageDialog(null, "Cliente alterado com sucesso!");
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Erro ao alterar cliente!");
         }
+    }
 
-        private static boolean validatedOption(String option) {
-            if ("1".equals(option || "2".equals(option ||"3".equals(option || "4".equals(option) || "5".equals)) {
-                return true;
-
-            } else {
-                return false;
-            }
+    private static void listAll() {
+        StringBuilder sb = new StringBuilder("Clientes cadastrados:\n");
+        for (Client client : iClient.searchAll()) {
+            sb.append(client).append("\n");
         }
+        JOptionPane.showMessageDialog(null, sb.toString());
+    }
 
-        private static boolean registerOption(String option) {
-            if ("1".equals(option)) {
-                return true;
-
-            } else {
-                return false;
-
-            }
-        }
+    private static void exit() {
+        JOptionPane.showMessageDialog(null, "Saindo do sistema...");
+        System.exit(0);
     }
 }
